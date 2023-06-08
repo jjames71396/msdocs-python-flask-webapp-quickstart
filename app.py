@@ -34,23 +34,30 @@ def favicon():
 
 @app.route('/hello', methods=['POST'])
 def hello():
+    found = False
     name = request.form.get('name')
-    
+    print(name)
     container_name = "store"
+    im = None
+    download_file_path = None
     for i,n in enumerate(df["Name"]):
         if n == name:
            im = df["Picture"][i]
-    local_file_name = im
-    upload_file_path = os.path.join(local_path, im)
-    # Create a blob client using the local file name as the name for the blob
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
-    blob_list = container_client.list_blobs()
-    
-    download_file_path = os.path.join(local_path, local_file_name)
-    container_client = blob_service_client.get_container_client(container= container_name) 
-
-    with open(file=download_file_path, mode="wb") as download_file:
-     download_file.write(container_client.download_blob(blob.name).readall())
+    if im is not None:
+        local_file_name = im
+        # Create a blob client using the local file name as the name for the blob
+        blob_client = blob_service_client.get_blob_client(container=container_name, blob=local_file_name)
+        
+        download_file_path = os.path.join(local_path, local_file_name)
+        container_client = blob_service_client.get_container_client(container= container_name) 
+        blob_list = container_client.list_blobs()
+        for blob in blob_list:
+            if local_file_name == blob.name:
+                found = True
+        
+        if found:
+            with open(file=download_file_path, mode="wb") as download_file:
+                download_file.write(container_client.download_blob(local_file_name).readall())
      
     if name:
        print('Request for hello page received with name=%s' % name)
