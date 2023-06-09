@@ -12,7 +12,7 @@ app = Flask(__name__)
 
 
 account_url = "https://asmt1.blob.core.windows.net"
-default_credential = DefaultAzureCredential()
+default_credential = DefaultAzureCredential(exclude_shared_token_cache_credential=True)
 
 # Create the BlobServiceClient object
 blob_service_client = BlobServiceClient(account_url, credential=default_credential)
